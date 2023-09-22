@@ -24,7 +24,7 @@ make
 
 ## Check if you are success
 ```
-cd ../userprog
+cd userprog
 user@user-VirtualBox:~/nachos/nachos-4.0/code/userprog$ ./nachos -e ../test/test1
 Total threads number is 1
 Thread ../test/test1 is executing.
