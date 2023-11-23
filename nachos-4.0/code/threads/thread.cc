@@ -418,7 +418,7 @@ SimpleThread()
     while(thread->getSJF() > 0){
 	thread->setBurstTime(thread->getSJF() - 1);
 	kernel->interrupt->OneTick();
-	printf("%s: remainging %d\n", kernel->currentThread->getName(), kernel->currentThread->getSJF());
+	printf("Thread: %s, Sequence: %d, Expected Time: %d, Priority: %d\n", kernel->currentThread->getName(), kernel->currentThread->getStart(),  kernel->currentThread->getSJF(), kernel->currentThread->getPriority());
     }
 }
 
