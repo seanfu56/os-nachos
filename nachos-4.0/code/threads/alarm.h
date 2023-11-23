@@ -21,7 +21,7 @@
 #include "utility.h"
 #include "callback.h"
 #include "timer.h"
-#include "list.h"
+#include <list>
 #include "thread.h"
 struct thread_time{
 	public:
@@ -33,8 +33,8 @@ class Waiting_Queue{
 	public:
 		Waiting_Queue();
 		~Waiting_Queue();
-		void oneTick();
-		List<thread_time> threads_array;
+		bool oneTick();
+		std::list<thread_time> threads_array;
 };
 
 
@@ -46,11 +46,11 @@ class Alarm : public CallBackObj {
     ~Alarm() { delete timer; delete queue;}
     
     void WaitUntil(int x);	// suspend execution until time > now + x
-    void OneTick();
+    bool OneTick();
 	Waiting_Queue* queue;
   private:
     Timer *timer;		// the hardware timer device
-
+    int now;
     void CallBack();		// called when the hardware
 				// timer generates an interrupt
 };

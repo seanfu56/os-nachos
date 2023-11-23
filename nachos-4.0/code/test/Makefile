@@ -12,7 +12,7 @@
 
 # if you are cross-compiling, you need to point to the right executables
 # and change the flags to ld and the build procedure for as
-GCCDIR = ../../../usr/local/nachos/decstation-ultrix/bin/
+GCCDIR = /usr/local/nachos/decstation-ultrix/bin/
 LDFLAGS = -T script -N
 ASFLAGS = -mips2
 CPPFLAGS = $(INCDIR)
@@ -33,7 +33,7 @@ CPP = /lib/cpp
 INCDIR =-I../userprog -I../threads -I../lib
 CFLAGS = -G 0 -c $(INCDIR)
 
-all: halt shell matmult sort test1 test2
+all: halt shell matmult sort test1 test2 test_sleep test_sleep2
 
 start.o: start.s ../userprog/syscall.h
 	$(CPP) $(CPPFLAGS) start.s > strt.s

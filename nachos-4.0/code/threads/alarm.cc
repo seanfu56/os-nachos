@@ -24,6 +24,7 @@ Alarm::Alarm(bool doRandom)
 {
     timer = new Timer(doRandom, this);
 	queue = new Waiting_Queue();
+	now = 0;
 }
 
 //----------------------------------------------------------------------
@@ -50,30 +51,33 @@ Alarm::Alarm(bool doRandom)
 void 
 Alarm::WaitUntil(int second)
 {
+//	cout << "wait until\n";
+	IntStatus o = kernel->interrupt->SetLevel(IntOff);
 	thread_time new_thread;
 	new_thread.thread = kernel->currentThread;
-	new_thread.time = second;
-	queue->threads_array.Append(new_thread);
+	new_thread.time = second+kernel->stats->totalTicks;
+	queue->threads_array.push_back(new_thread);
 	kernel->currentThread->Sleep(false);
+	kernel->interrupt->SetLevel(o);
 }
 
-void
+bool
 Alarm::OneTick()
 {
-	ListIterator<thread_time> iter(&queue->threads_array);
-	for(; !iter.IsDone(); iter.Next()){
-		thread_time t = iter.Item();
-		t.time --;
-	}
-
-	ListIterator<thread_time> iter2(&queue->threads_array);
-	while(!iter2.IsDone()){
-		thread_time t = iter2.Item();
-		iter2.Next();
-		if(t.time == -1){
-			queue->threads_array.Remove(t);
+//	cout << now << "\n";
+//	cout << kernel->stats->totalTicks << "\n";
+	now = kernel->stats->totalTicks;
+	bool b = false;
+	for(std::list<thread_time>::iterator i = queue->threads_array.begin(); i != queue->threads_array.end();){
+		if(now >= i->time){
+			kernel->scheduler->ReadyToRun(i->thread);
+			i = queue->threads_array.erase(i);
+			b = true;
+		}else{
+			i++;
 		}
 	}
+	return b;
 }
 
 void 
@@ -81,8 +85,8 @@ Alarm::CallBack()
 {
     Interrupt *interrupt = kernel->interrupt;
     MachineStatus status = interrupt->getStatus();
-    OneTick();
-    if (status == IdleMode && queue->threads_array.IsEmpty()) {	// is it time to quit?
+    bool b = OneTick();
+    if (status == IdleMode && !b  && queue->threads_array.size() == 0) {	// is it time to quit?
         if (!interrupt->AnyFutureInterrupts()) {
 	    timer->Disable();	// turn off the timer
 	}
