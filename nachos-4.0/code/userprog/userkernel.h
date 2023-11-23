@@ -23,7 +23,7 @@ class UserProgKernel : public ThreadedKernel {
 				// Interpret command line arguments
     ~UserProgKernel();		// deallocate the kernel
 
-    void Initialize();		// initialize the kernel 
+    void Initialize(SchedulerType);		// initialize the kernel 
 
     void Run();			// do kernel stuff 
 

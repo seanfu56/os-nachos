@@ -52,9 +52,9 @@ UserProgKernel::UserProgKernel(int argc, char **argv)
 //----------------------------------------------------------------------
 
 void
-UserProgKernel::Initialize()
+UserProgKernel::Initialize(SchedulerType t)
 {
-    ThreadedKernel::Initialize();	// init multithreading
+    ThreadedKernel::Initialize(t);	// init multithreading
 
     machine = new Machine(debugUserProg);
     fileSystem = new FileSystem();
