@@ -46,11 +46,11 @@ ThreadedKernel::ThreadedKernel(int argc, char **argv)
 //----------------------------------------------------------------------
 
 void
-ThreadedKernel::Initialize()
+ThreadedKernel::Initialize(SchedulerType t)
 {
     stats = new Statistics();		// collect statistics
     interrupt = new Interrupt;		// start up interrupt handling
-    scheduler = new Scheduler();	// initialize the ready queue
+    scheduler = new Scheduler(t);	// initialize the ready queue
     alarm = new Alarm(randomSlice);	// start up time slicing
 
     // We didn't explicitly allocate the current thread we are running in.
@@ -108,8 +108,8 @@ ThreadedKernel::SelfTest() {
    
    LibSelfTest();		// test library routines
    
-   currentThread->SelfTest();	// test thread switching
-   
+//   currentThread->SelfTest();	// test thread switching
+   Thread::Test();
    				// test semaphore operation
    semaphore = new Semaphore("test", 0);
    semaphore->SelfTest();

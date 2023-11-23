@@ -83,6 +83,11 @@ class Thread {
     int *stackTop;			 // the current stack pointer
     void *machineState[MachineStateSize];  // all registers except for stackTop
 
+
+    int sjf;
+    int priority;
+    int start;
+
   public:
     Thread(char* debugName);		// initialize a Thread 
     ~Thread(); 				// deallocate a Thread
@@ -91,7 +96,13 @@ class Thread {
 					// is called
 
     // basic thread operations
-
+    int getSJF() { return sjf; };
+    int getPriority() { return priority; };
+    int getStart() { return start; };
+    void setPriority(int p) { priority = p;};
+    void setBurstTime(int b) { sjf = b;};
+    void setStart(int s) {start = s;};
+    static void Test();
     void Fork(VoidFunctionPtr func, void *arg); 
     				// Make thread run (*func)(arg)
     void Yield();  		// Relinquish the CPU if any 

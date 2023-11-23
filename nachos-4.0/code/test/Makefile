@@ -12,7 +12,7 @@
 
 # if you are cross-compiling, you need to point to the right executables
 # and change the flags to ld and the build procedure for as
-GCCDIR = /usr/local/nachos/decstation-ultrix/bin/
+GCCDIR = ../../../usr/local/nachos/decstation-ultrix/bin/
 LDFLAGS = -T script -N
 ASFLAGS = -mips2
 CPPFLAGS = $(INCDIR)
@@ -42,15 +42,15 @@ start.o: start.s ../userprog/syscall.h
 
 #halt.o: halt.c
 #	$(CC) $(CFLAGS) -c halt.c
-halt: halt.o start.o
-	$(LD) $(LDFLAGS) start.o halt.o -o halt.coff
-	../bin/coff2noff halt.coff halt
+#halt: halt.o start.o
+#	$(LD) $(LDFLAGS) start.o halt.o -o halt.coff
+#	../bin/coff2noff halt.coff halt
 
 #shell.o: shell.c
 #	$(CC) $(CFLAGS) -c shell.c
-shell: shell.o start.o
-	$(LD) $(LDFLAGS) start.o shell.o -o shell.coff
-	../bin/coff2noff shell.coff shell
+#shell: shell.o start.o
+#	$(LD) $(LDFLAGS) start.o shell.o -o shell.coff
+#	../bin/coff2noff shell.coff shell
 
 #sort.o: sort.c
 #	$(CC) $(CFLAGS) -c sort.c
@@ -72,4 +72,16 @@ test2: test2.o start.o
 	$(LD) $(LDFLAGS) start.o test2.o -o test2.coff
 	../bin/coff2noff test2.coff test2
 
+#test_sleep.o: test_sleep.c
+#	$(CC) $(CFLAGS) -c test_sleep.c
 
+#test_sleep2.o: test_sleep2.c
+#	$(CC) $(CFLAGS) -c test_sleep2.c
+
+test_sleep: test_sleep.o start.o
+	$(LD) $(LDFLAGS) start.o test_sleep.o -o test_sleep.coff
+	../bin/coff2noff test_sleep.coff test_sleep
+
+test_sleep2: test_sleep2.o start.o
+	$(LD) $(LDFLAGS) start.o test_sleep2.o -o test_sleep2.coff
+	../bin/coff2noff test_sleep2.coff test_sleep2

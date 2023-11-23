@@ -1,4 +1,4 @@
-// thread.cc 
+// thread.cc
 //	Routines to manage threads.  These are the main operations:
 //
 //	Fork -- create a thread to run a procedure concurrently
@@ -69,6 +69,7 @@ Thread::~Thread()
     if (stack != NULL)
 	DeallocBoundedArray((char *) stack, StackSize * sizeof(int));
 }
+
 
 //----------------------------------------------------------------------
 // Thread::Fork
@@ -410,13 +411,14 @@ Thread::RestoreUserState()
 //----------------------------------------------------------------------
 
 static void
-SimpleThread(int which)
+SimpleThread()
 {
     int num;
-    
-    for (num = 0; num < 5; num++) {
-	cout << "*** thread " << which << " looped " << num << " times\n";
-        kernel->currentThread->Yield();
+    Thread* thread = kernel->currentThread;
+    while(thread->getSJF() > 0){
+	thread->setBurstTime(thread->getSJF() - 1);
+	kernel->interrupt->OneTick();
+	printf("%s: remainging %d\n", kernel->currentThread->getName(), kernel->currentThread->getSJF());
     }
 }
 
@@ -427,13 +429,38 @@ SimpleThread(int which)
 //----------------------------------------------------------------------
 
 void
-Thread::SelfTest()
+Thread::Test()
 {
-    DEBUG(dbgThread, "Entering Thread::SelfTest");
+//    DEBUG(dbgThread, "Entering Thread::SelfTest");
 
-    Thread *t = new Thread("forked thread");
-
-    t->Fork((VoidFunctionPtr) SimpleThread, (void *) 1);
-    SimpleThread(0);
+    //const int threads = 4;
+    char *name[26] = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"};
+    //int thread_priority[threads] = {5, 1, 3, 2};
+    //int thread_burst[threads] = {3, 9, 7, 3};
+    Thread *t;
+    int threads;
+    cout << "number of threads: ";
+    cin >> threads;
+    for(int i=0; i < threads; i++){
+	t = new Thread(name[i]);
+	int p, b;
+	cout << "thread" << i << " priority     : ";
+	cin >> p;
+	t->setPriority(p);
+	cout << "thread" << i << " expected time: ";
+	cin >> b;
+	t->setBurstTime(b);
+	t->setStart(i);
+	t->Fork((VoidFunctionPtr) SimpleThread, (void *)NULL);
+    }
+    kernel->currentThread->Yield();
 }
 
+void
+Thread::SelfTest()
+{
+	DEBUG(dbgThread, "Entering Thread::SelfTest");
+	Thread *t;
+	t->Fork((VoidFunctionPtr) SimpleThread, (void *) 1);
+	SimpleThread();
+}

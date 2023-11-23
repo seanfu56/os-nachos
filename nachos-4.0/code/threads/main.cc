@@ -57,7 +57,7 @@ main(int argc, char **argv)
 {
     int i;
     char *debugArg = "";
-
+    SchedulerType type = RR;
     // before anything else, initialize the debugging system
     for (i = 1; i < argc; i++) {
         if (strcmp(argv[i], "-d") == 0) {
@@ -68,15 +68,30 @@ main(int argc, char **argv)
             cout << "Partial usage: nachos [-z -d debugFlags]\n";
 	} else if (strcmp(argv[i], "-z") == 0) {
             cout << copyright;
+	} else if (strcmp(argv[i], "-scheduler") == 0){
+		if(strcmp(argv[i+1], "FCFS") == 0){
+			cout << "scheduler: FCFS\n"; 
+			type = FCFS;
+		}else if(strcmp(argv[i+1], "SJF") == 0){
+			cout << "scheduler: SJF\n";
+			type = SJF;
+		}else if(strcmp(argv[i+1], "Priority") == 0){
+			cout << "scheduler: Priority\n";
+			type = Priority;
+		}else{
+			cout << "scheduler: RR\n";
+			type = RR;
+		}
 	}
 
     }
+
     debug = new Debug(debugArg);
     
     DEBUG(dbgThread, "Entering main");
 
     kernel = new KernelType(argc, argv);
-    kernel->Initialize();
+    kernel->Initialize(type);
     
     CallOnUserAbort(Cleanup);		// if user hits ctl-C
 

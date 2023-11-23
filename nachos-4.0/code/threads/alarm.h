@@ -21,16 +21,33 @@
 #include "utility.h"
 #include "callback.h"
 #include "timer.h"
+#include "list.h"
+#include "thread.h"
+struct thread_time{
+	public:
+		Thread* thread;
+		int     time;
+};
+
+class Waiting_Queue{
+	public:
+		Waiting_Queue();
+		~Waiting_Queue();
+		void oneTick();
+		List<thread_time> threads_array;
+};
+
 
 // The following class defines a software alarm clock. 
 class Alarm : public CallBackObj {
   public:
     Alarm(bool doRandomYield);	// Initialize the timer, and callback 
 				// to "toCall" every time slice.
-    ~Alarm() { delete timer; }
+    ~Alarm() { delete timer; delete queue;}
     
     void WaitUntil(int x);	// suspend execution until time > now + x
-
+    void OneTick();
+	Waiting_Queue* queue;
   private:
     Timer *timer;		// the hardware timer device
 

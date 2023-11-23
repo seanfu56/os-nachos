@@ -23,6 +23,7 @@
 Alarm::Alarm(bool doRandom)
 {
     timer = new Timer(doRandom, this);
+	queue = new Waiting_Queue();
 }
 
 //----------------------------------------------------------------------
@@ -47,12 +48,41 @@ Alarm::Alarm(bool doRandom)
 //----------------------------------------------------------------------
 
 void 
+Alarm::WaitUntil(int second)
+{
+	thread_time new_thread;
+	new_thread.thread = kernel->currentThread;
+	new_thread.time = second;
+	queue->threads_array.Append(new_thread);
+	kernel->currentThread->Sleep(false);
+}
+
+void
+Alarm::OneTick()
+{
+	ListIterator<thread_time> iter(&queue->threads_array);
+	for(; !iter.IsDone(); iter.Next()){
+		thread_time t = iter.Item();
+		t.time --;
+	}
+
+	ListIterator<thread_time> iter2(&queue->threads_array);
+	while(!iter2.IsDone()){
+		thread_time t = iter2.Item();
+		iter2.Next();
+		if(t.time == -1){
+			queue->threads_array.Remove(t);
+		}
+	}
+}
+
+void 
 Alarm::CallBack() 
 {
     Interrupt *interrupt = kernel->interrupt;
     MachineStatus status = interrupt->getStatus();
-    
-    if (status == IdleMode) {	// is it time to quit?
+    OneTick();
+    if (status == IdleMode && queue->threads_array.IsEmpty()) {	// is it time to quit?
         if (!interrupt->AnyFutureInterrupts()) {
 	    timer->Disable();	// turn off the timer
 	}
@@ -61,3 +91,16 @@ Alarm::CallBack()
     }
 }
 
+
+bool
+operator == (thread_time a, thread_time b){
+	if(a.thread == b.thread && a.time == b.time){
+		return true;
+	}else{
+		return false;
+	}
+}
+
+Waiting_Queue::Waiting_Queue(){}
+
+Waiting_Queue::~Waiting_Queue(){}

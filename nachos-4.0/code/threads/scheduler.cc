@@ -29,11 +29,53 @@
 //	Initially, no ready threads.
 //----------------------------------------------------------------------
 
+int sjf(Thread* a, Thread* b){
+	if(a->getSJF() > b->getSJF()){
+		return 1;
+	}else{
+		return -1;
+	}
+}
+
+int priority(Thread* a, Thread* b){
+	if(a->getPriority() > b->getPriority()){
+		return 1;
+	}else{
+		return -1;
+	}
+}
+
+int fcfs(Thread* a, Thread* b){
+	if(a->getStart() > b->getStart()){
+		return 1;
+	}else{
+		return -1;
+	}
+}
+
 Scheduler::Scheduler()
 {
-//	schedulerType = type;
+	cout << "ORIGIN\n";
+	schedulerType = RR;
 	readyList = new List<Thread *>; 
 	toBeDestroyed = NULL;
+}
+
+Scheduler::Scheduler(SchedulerType t)
+{
+	if(t == RR){
+		cout << "RR\n";
+		readyList = new List<Thread *>;
+	}else if(t == SJF){
+		cout << "SJF\n";
+		readyList = new SortedList<Thread *>(sjf);
+	}else if(t == Priority){
+		cout << "Priority\n";
+		readyList = new SortedList<Thread *>(priority);
+	}else if(t == FCFS){
+		cout << "FCFS\n";
+		readyList = new SortedList<Thread *>(fcfs);
+	}
 } 
 
 //----------------------------------------------------------------------
