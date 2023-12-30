@@ -11,7 +11,6 @@
 
 #ifndef USERKERNEL_H  
 #define USERKERNEL_H
-
 #include "kernel.h"
 #include "filesys.h"
 #include "machine.h"
@@ -33,12 +32,14 @@ class UserProgKernel : public ThreadedKernel {
     Machine *machine;
     FileSystem *fileSystem;
 
+    SynchDisk *swapDisk;
+    bool debugUserProg;
 #ifdef FILESYS
     SynchDisk *synchDisk;
 #endif // FILESYS
 
   private:
-    bool debugUserProg;		// single step user program
+//    bool debugUserProg;		// single step user program
 	Thread* t[10];
 	char*	execfile[10];
 	int	execfileNum;

@@ -53,7 +53,15 @@ ExceptionHandler(ExceptionType which)
 {
 	int	type = kernel->machine->ReadRegister(2);
 	int	val;
-
+	unsigned int vpn;
+	unsigned int offset;
+	bool valid;
+	bool valin;
+	char *data;
+	int physSector;
+	int translatedVirPage;
+	int translatedPhyPage;
+	char memoryData[PageSize];
     switch (which) {
 	case SyscallException:
 	    switch(type) {
@@ -89,6 +97,43 @@ ExceptionHandler(ExceptionType which)
  		    break;
 	    }
 	    break;
+	case PageFaultException:
+		val=kernel->machine->ReadRegister(BadVAddrReg);
+		printf("%d\n", val);
+		//unsigned int vpn;
+		//unsigned int offset;
+		//bool valid;
+		printf("%d\n", kernel->machine->pageTable[1].physicalPage);
+		vpn = (unsigned) val / PageSize;
+		offset = (unsigned) val % PageSize;
+		//bool valin;
+		valid = kernel->machine->pageTable[vpn].valid;
+		printf("%d, %d\n", vpn, valid);
+		//char* data;
+		//int physSector = kernel->machine->pageTable[vpn].physicalPage;
+		physSector = kernel->machine->pageTable[vpn].physicalPage;
+		printf("physSector: %d\n", physSector);
+		kernel->swapDisk->ReadSector(physSector, data);
+		//printf("%s\n", data);
+		//int translatedVirPage;
+		translatedVirPage = 0;
+		//int translatedPhyPage;
+		translatedPhyPage = kernel->machine->pageTable[translatedVirPage].physicalPage;
+		//char memoryData[PageSize];
+		printf("%d\n", translatedPhyPage * PageSize);
+		for(int i=0;i<PageSize;i++){
+			int addr = translatedPhyPage * PageSize + i;
+			//ASSERT(addr < MemorySize);
+			memoryData[i] = kernel->machine->mainMemory[translatedPhyPage * PageSize + i];
+		}
+		kernel->swapDisk->WriteSector(physSector, data);
+		kernel->machine->pageTable[translatedVirPage].valid = false;
+		kernel->machine->pageTable[translatedVirPage].physicalPage = physSector;
+		kernel->machine->pageTable[vpn].valid = true;
+		kernel->machine->pageTable[vpn].physicalPage = translatedPhyPage;
+		//break;
+		printf("switching finished\n");
+		return;
 	default:
 	    cerr << "Unexpected user mode exception" << which << "\n";
 	    break;

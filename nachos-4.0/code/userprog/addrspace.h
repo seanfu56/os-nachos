@@ -15,6 +15,7 @@
 
 #include "copyright.h"
 #include "filesys.h"
+#include "disk.h"
 #include <string.h>
 
 #define UserStackSize		1024 	// increase this as necessary!
@@ -30,8 +31,11 @@ class AddrSpace {
     void SaveState();			// Save/restore address space-specific
     void RestoreState();		// info on a context switch
     static bool running[NumPhysPages]; 
-
-  private:
+    static bool usedSectors[NumSectors];
+    int ID; 
+ private:
+    static int NumFreePages;
+    bool pageTable_is_load;
     TranslationEntry *pageTable;	// Assume linear page table translation
 					// for now!
     unsigned int numPages;		// Number of pages in the virtual 
