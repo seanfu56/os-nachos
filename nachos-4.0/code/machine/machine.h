@@ -132,7 +132,14 @@ class Machine {
     TranslationEntry *pageTable;
     unsigned int pageTableSize;
     bool ReadMem(int addr, int size, int* value);
-  private:
+ 
+    //Modified
+    //bool UsedPhyPage[NumPhysPages];
+    //bool UsedVirtualPage[NumPhysPages];
+    //int ID_number;
+    //int PhyPageInfo[NumPhysPages];
+    //TranslationEntry *main_tab[NumPhysPages];
+ private:
 
 // Routines internal to the machine simulation -- DO NOT call these directly
     void DelayedLoad(int nextReg, int nextVal);  	

@@ -92,6 +92,21 @@ Machine::ReadMem(int addr, int size, int *value)
     DEBUG(dbgAddr, "Reading VA " << addr << ", size " << size);
     
     exception = Translate(addr, &physicalAddress, size, FALSE);
+    /*
+    if(exception == SyscallException){
+	printf("SyscallException\n");
+    }else if(exception == PageFaultException){
+	printf("PageFaultException\n");
+    }else if(exception == ReadOnlyException){
+	printf("ReadOnlyException\n");
+    }else if(exception == BusErrorException){
+	printf("BusErrorException\n");
+    }else if(exception == AddressErrorException){
+	printf("AddressErrorException\n");
+    }else if(exception == OverflowException){
+	printf("OverflowException\n");
+    }
+    */
     if (exception != NoException) {
 	RaiseException(exception, addr);
 	return FALSE;
@@ -141,6 +156,21 @@ Machine::WriteMem(int addr, int size, int value)
     DEBUG(dbgAddr, "Writing VA " << addr << ", size " << size << ", value " << value);
 
     exception = Translate(addr, &physicalAddress, size, TRUE);
+    /*
+    if(exception == SyscallException){
+        printf("SyscallException\n");
+    }else if(exception == PageFaultException){
+        printf("PageFaultException\n");
+    }else if(exception == ReadOnlyException){
+        printf("ReadOnlyException\n");
+    }else if(exception == BusErrorException){
+        printf("BusErrorException\n");
+    }else if(exception == AddressErrorException){
+        printf("AddressErrorException\n");
+    }else if(exception == OverflowException){
+        printf("OverflowException\n");
+     }
+    */
     if (exception != NoException) {
 	RaiseException(exception, addr);
 	return FALSE;
@@ -188,7 +218,8 @@ Machine::Translate(int virtAddr, int* physAddr, int size, bool writing)
     unsigned int vpn, offset;
     TranslationEntry *entry;
     unsigned int pageFrame;
-
+    int victim;
+    unsigned int j;
     DEBUG(dbgAddr, "\tTranslate " << virtAddr << (writing ? " , write" : " , read"));
 
 // check for alignment errors
@@ -211,7 +242,6 @@ Machine::Translate(int virtAddr, int* physAddr, int size, bool writing)
 	    DEBUG(dbgAddr, "Illegal virtual page # " << virtAddr);
 	    return AddressErrorException;
 	} else if (!pageTable[vpn].valid) {
-	    DEBUG(dbgAddr, "Invalid virtual page # " << virtAddr);
 	    return PageFaultException;
 	}
 	entry = &pageTable[vpn];

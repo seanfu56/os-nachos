@@ -34,6 +34,13 @@ class UserProgKernel : public ThreadedKernel {
 
     SynchDisk *swapDisk;
     bool debugUserProg;
+    bool UsedPhyPage [NumPhysPages];
+    bool UsedVirtualPage [NumPhysPages];
+    int LRU_counter[NumPhysPages];
+    int ID[NumPhysPages];
+    int ID_number;
+    int PhyPageInfo [NumPhysPages];
+    TranslationEntry *main_tab [NumPhysPages];
 #ifdef FILESYS
     SynchDisk *synchDisk;
 #endif // FILESYS

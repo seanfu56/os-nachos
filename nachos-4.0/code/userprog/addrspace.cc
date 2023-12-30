@@ -68,8 +68,8 @@ AddrSpace::AddrSpace()
     
     // zero out the entire address space
 //    bzero(kernel->machine->mainMemory, MemorySize);
-    ID = (kernel->machine->ID_number)++;
-    kernel->machine->ID_number = (kernel->machine->ID_number)++;
+    ID = (kernel->ID_number)++;
+    kernel->ID_number = (kernel->ID_number)++;
 }
 
 //----------------------------------------------------------------------
@@ -184,34 +184,37 @@ bool AddrSpace::Load(char *fileName)
     if(noffH.code.size > 0){
 	for(unsigned int j=0, i=0; i < numPages; i++){
 	    j = 0;
-	    while(kernel->machine->UsedPhyPage[j] != false && j < NumPhysPages)
+	    while(kernel->UsedPhyPage[j] != false && j < NumPhysPages)
 		j++;
 	    if(j < NumPhysPages){
-		kernel->machine->UsedPhyPage[j] = true;
-		kernel->machine->PhyPageInfo[j] = ID;
-		kernel->machine->main_tab[j] = &pageTable[i];
+		kernel->UsedPhyPage[j] = true;
+		kernel->PhyPageInfo[j] = ID;
+		kernel->main_tab[j] = &pageTable[i];
 		pageTable[i].physicalPage = j;
 		pageTable[i].valid = true;
 		pageTable[i].use = false;
 		pageTable[i].dirty = false;
 		pageTable[i].readOnly = false;
-		pageTable[i].ID = ID;
-		pageTable[i].LRU_counter++;
+		//pageTable[i].ID = ID;
+		//pageTable[i].LRU_counter++;
+		kernel->ID[i] = ID;
+		kernel->LRU_counter[i] ++;
 		executable->ReadAt(&(kernel->machine->mainMemory[j * PageSize]), PageSize, noffH.code.inFileAddr + (i * PageSize));
 	    }else{
 		char *buffer;
 		buffer = new char[PageSize];
 		tmp = 0;
-		while(kernel->machine->UsedVirtualPage[tmp] != false){
+		while(kernel->UsedVirtualPage[tmp] != false){
 			tmp ++;
 		}
-		kernel->machine->UsedVirtualPage[tmp] = true;
+		kernel->UsedVirtualPage[tmp] = true;
 		pageTable[i].virtualPage = tmp;
 		pageTable[i].valid = false;
 		pageTable[i].use = false;
 		pageTable[i].dirty = false;
 		pageTable[i].readOnly = false;
-		pageTable[i].ID = ID;
+		//pageTable[i].ID = ID;
+		kernel->ID[i] = ID;
 		executable->ReadAt(buffer, PageSize, noffH.code.inFileAddr + (i * PageSize));
 		kernel->swapDisk->WriteSector(tmp, buffer);
 	    }
